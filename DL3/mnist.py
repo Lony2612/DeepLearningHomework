@@ -16,11 +16,9 @@ def show_all_variables():
   model_vars = tf.trainable_variables()
   slim.model_analyzer.analyze_vars(model_vars, print_info=True)
 
-def X_W(X, reuse=False):
-    with tf.variable_scope("X_W") as scope:
-        if reuse:
-            scope.reuse_variables()
-        W = tf.Variable(tf.zeros([392, 10]),name='w')
+def X_W(X):
+    with tf.variable_scope("X_W", reuse=tf.AUTO_REUSE) as scope:
+        W = tf.get_variable('W', [392, 10])
         return tf.matmul(X,W)
 
 # plt.axis([0, 100, 0, 1])
@@ -41,8 +39,8 @@ mnist = input_data.read_data_sets('./data/mnist',one_hot=True)
 x1 = tf.placeholder(tf.float32, [None, 392])
 x2 = tf.placeholder(tf.float32, [None, 392])
 # W = tf.Variable(tf.zeros([784, 10]))
-b = tf.Variable(tf.zeros([10]))
-y = tf.nn.softmax(X_W(x1)+X_W(x2,True)+b) #预测值
+b = tf.Variable(tf.zeros([10]), name="b")
+y = tf.nn.softmax(X_W(x1)+X_W(x2)+b) #预测值
 
 #定义损失函数和优化器
 y_ = tf.placeholder(tf.float32, [None, 10])
